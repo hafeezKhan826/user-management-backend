@@ -1,17 +1,31 @@
 global using Microsoft.EntityFrameworkCore;
 
 using AspNetCoreDemo.Data;
+using AspNetCoreDemo.Models;
+using AspNetCoreDemo.Services;
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 // using
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbucklef
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<AppDbContext>();
-builder.Services.AddScoped<UserProfileService>();
+/* builder.Services.AddDbContext<AppDbContext>(optionsAction =>
+{
+    optionsAction.UseMongoDB(builder.Configuration.GetConnectionString("DefaultConnection"));
+}); */
+builder.Services.Configure<UserDatabaseSettings>(builder.Configuration.GetSection(nameof(UserDatabaseSettings)));
+builder.Services.AddSingleton<IUserDatabaseSettings>(sp => sp.GetRequiredService<IOptions<UserDatabaseSettings>>().Value);
+builder.Services.AddSingleton<IMongoClient>(s => new MongoClient(builder.Configuration.GetValue<string>("UserDatabaseSettings:ConnectionString")));
+
+builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+
+// builder.Services.AddScoped<UserProfileService, IUserProfileService>();
+// builder.Services.AddScoped<UserProfileService>();
 
 // builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 // builder.Services.AddDbContext<AppDbContext>(options => options.);

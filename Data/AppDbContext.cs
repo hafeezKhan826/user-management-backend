@@ -5,9 +5,13 @@ namespace AspNetCoreDemo.Data
     public class AppDbContext : DbContext
     {
         public DbSet<UserProfile> UserProfiles { get; set; }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
-            optionsBuilder.UseInMemoryDatabase("UserDatabase");
+            // options.UseInMemoryDatabase("UserDatabase");
+            // options.UseSqlite(Configuration.GetCon);
+        }
+        public AppDbContext(DbContextOptions options) : base(options)
+        {
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -20,7 +24,7 @@ namespace AspNetCoreDemo.Data
             modelBuilder.Entity<UserProfile>().HasData(
             new UserProfile
             {
-                Id = 1,
+                Id = "1",
                 Name = "John Doe",
                 Email = "john.doe@example.com",
                 ProfilePicture = "https://example.com/profiles/john_doe.jpg",
@@ -29,7 +33,7 @@ namespace AspNetCoreDemo.Data
             },
             new UserProfile
             {
-                Id = 2,
+                Id = "2",
                 Name = "Jane Smith",
                 Email = "jane.smith@example.com",
                 ProfilePicture = "https://example.com/profiles/jane_smith.jpg",
